@@ -32,9 +32,8 @@ DWORD WINAPI CheckThread(LPVOID lParam)
 			HTarget = OpenProcess(PROCESS_TERMINATE, FALSE, TargetId);
 			if (HTarget == nullptr)
 				return -1;
-			if (TerminateProcess(HTarget, 0) == FALSE)
-				return -1;
-			MessageBox(NULL, _T("디버거 감지"), _T("정보"), MB_OK);
+			TerminateProcess(HTarget, 0);
+			//MessageBox(NULL, _T("디버거 감지"), _T("정보"), MB_OK);
 		}
 	}
 	CloseHandle(HTarget);
@@ -81,6 +80,8 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		DWORD dwThId = 0;
 		ConfigToken(pd);
 		int index = 0;
+		//while (index != pd->index)
+		//	MessageBox(NULL, pd->Token[index++], _T("정보"), MB_OK);
 		pd->hThread = CreateThread(NULL, 0, CheckThread, (LPVOID)pd, 0, &dwThId);
 		pd->hDvEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		return 0;

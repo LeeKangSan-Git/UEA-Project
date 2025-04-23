@@ -1,1 +1,1 @@
-target = cheatengine,OLLYDBG.EXE,x64dbg.exe
+target = cheatengine,OLLYDBG.EXE,x64dbg.exe,x32dbg.exe
