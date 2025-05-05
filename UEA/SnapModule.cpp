@@ -35,20 +35,26 @@ DWORD GetProcId(LPCTSTR Name)
 DWORD CheckModule(LPCTSTR Name, DWORD pId)
 {
 	HANDLE hModSnap;
+	BOOL ch = FALSE;
 	MODULEENTRY32 ModEntry;
 
 	hModSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pId);
 	if (hModSnap == INVALID_HANDLE_VALUE)
-		return 0;
+		return 2;
 
 	ModEntry.dwSize = sizeof(MODULEENTRY32);
 	Module32First(hModSnap, &ModEntry);
 	do
 	{
 		if (!_tcsicmp(ModEntry.szModule, Name))
+		{
+			ch = TRUE;
 			break;
+		}
 	} while (Module32Next(hModSnap, &ModEntry));
 
 	CloseHandle(hModSnap);
-	return 1;
+	if (ch == TRUE)
+		return 1;
+	return 0;
 }

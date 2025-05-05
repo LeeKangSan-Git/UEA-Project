@@ -9,4 +9,5 @@
 
 using namespace std;
 
+void TrimSpaces(TCHAR*& str);
 DWORD ConfigToken(PTDATA pda);

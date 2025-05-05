@@ -9,9 +9,11 @@ using namespace std;
 
 struct TData
 {
+	HWND hWnd;
 	TCHAR* Token[TOKEN_SIZE];
-	int index;
-	HANDLE hThread;
+	TCHAR* DllToken[TOKEN_SIZE];
+	int index, dllIndex;
+	HANDLE hThread[2];
 	HANDLE hDvEvent;
 
 	TData()
@@ -23,3 +25,4 @@ using PTDATA = TData*;
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 DWORD WINAPI CheckThread(LPVOID lParam);
+DWORD WINAPI DllCheck(LPVOID lParam);
