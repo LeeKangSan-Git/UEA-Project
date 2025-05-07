@@ -7,5 +7,7 @@
 
 using namespace std;
 
+enum MdCheck { MD_INJECT, MD_OK, MD_ERROR };
+
 DWORD GetProcId(LPCTSTR Name);
-DWORD CheckModule(LPCTSTR Name, DWORD pId);
+DWORD CheckModule(PTDATA pda, DWORD pId);

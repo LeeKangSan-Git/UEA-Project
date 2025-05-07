@@ -3,6 +3,7 @@
 #include <tchar.h>
 #include <TlHelp32.h>
 #include "main.h"
+#include "SnapModule.h"
 
 using namespace std;
 
@@ -32,29 +33,39 @@ DWORD GetProcId(LPCTSTR Name)
 	return pId;
 }
 
-DWORD CheckModule(LPCTSTR Name, DWORD pId)
+DWORD CheckModule(PTDATA pda, DWORD pId)
 {
 	HANDLE hModSnap;
 	BOOL ch = FALSE;
 	MODULEENTRY32 ModEntry;
+	int i = 0;
 
 	hModSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, pId);
 	if (hModSnap == INVALID_HANDLE_VALUE)
-		return 2;
+		return MD_ERROR;
 
 	ModEntry.dwSize = sizeof(MODULEENTRY32);
 	Module32First(hModSnap, &ModEntry);
 	do
 	{
-		if (!_tcsicmp(ModEntry.szModule, Name))
+		ch = FALSE;
+		
+		for (i = 0; i < pda->dllIndex; i++)
 		{
-			ch = TRUE;
-			break;
+			if (_tcsicmp(ModEntry.szModule, pda->DllToken[i]) == 0)
+			{
+				ch = TRUE;
+				break;
+			}
 		}
+
+		if (ch == FALSE)
+			break;
 	} while (Module32Next(hModSnap, &ModEntry));
 
+	//MessageBox(NULL, ModEntry.szModule, _T("Á¤º¸"), MB_OK);
 	CloseHandle(hModSnap);
-	if (ch == TRUE)
-		return 1;
-	return 0;
+	if (ch == TRUE && i == pda->dllIndex - 1)
+		return MD_OK;
+	return MD_INJECT;
 }

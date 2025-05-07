@@ -47,29 +47,38 @@ DWORD WINAPI DllCheck(LPVOID lParam)
 {
 	PTDATA pda = (PTDATA)lParam;
 	DWORD hTarget;
-	int index = 0, check = 0;
+	int check = 0;
+	HANDLE hT;
+	DWORD exitProx;
+
+	do //메모장 프로세스를 확인후 다음 루프를 돌때 메모장이 종료되어 있다면 hTarget의 값은 그대로 인가? 예상은 그대로
+	{
+		hTarget = GetProcId(_T("notepad.exe"));
+	} while (hTarget == 0);
+
+	hT = OpenProcess(PROCESS_TERMINATE, FALSE, hTarget);
 	
 	while (true)
 	{
-		do
+		if (GetExitCodeProcess(hT, &exitProx))
 		{
-			hTarget = GetProcId(_T("notepad.exe"));
-		} while (hTarget == 0);
-
-		if (index == pda->dllIndex)
-			index = 0;
-		check = 0;
-		check = CheckModule(pda->DllToken[index], hTarget);
-		if (check == 1)
-		{
-			index++;
-			continue;
+			if (exitProx != STILL_ACTIVE)
+			{
+				do
+				{
+					hTarget = GetProcId(_T("notepad.exe"));
+				} while (hTarget == 0);
+				hT = OpenProcess(PROCESS_TERMINATE, FALSE, hTarget);
+			}
 		}
-		else if (check == 2)
+
+		Sleep(500); //dll인 전부 로딩될때까지 기다려주기 위해
+		check = MD_INJECT;
+		check = CheckModule(pda, hTarget);
+		if (check == MD_ERROR || check == MD_OK)
 			continue;
 		else
 		{
-			HANDLE hT = OpenProcess(PROCESS_TERMINATE, FALSE, hTarget);
 			TerminateProcess(hT, 0);
 			CloseHandle(hT);
 			MessageBox(NULL, _T("인젝션 감지"), _T("경고"), MB_ICONHAND);
